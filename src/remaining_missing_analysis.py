@@ -5,7 +5,7 @@ import pandas as pd
 # Load recovered dataset
 # --------------------------------------------------
 
-data_path = "data/processed/car_data_recovered.csv"
+data_path = "data/processed/car_data_torque_corrected.csv"
 
 df = pd.read_csv(data_path)
 
@@ -15,10 +15,10 @@ df = pd.read_csv(data_path)
 # --------------------------------------------------
 
 technical_columns = [
-    "mileage",
-    "engine",
-    "max_power",
-    "torque",
+    "mileage_value",
+    "engine_cc",
+    "max_power_bhp",
+    "torque_nm",
     "seats"
 ]
 
