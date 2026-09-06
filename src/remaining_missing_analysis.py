@@ -5,7 +5,7 @@ import pandas as pd
 # Load recovered dataset
 # --------------------------------------------------
 
-data_path = "data/processed/car_data_torque_corrected.csv"
+data_path = "data/processed/car_data_model_recovered.csv"
 
 df = pd.read_csv(data_path)
 
@@ -469,5 +469,150 @@ print(
     confidence_df[
         confidence_df["confidence"] == "HIGH"
     ]
+    .to_string(index=False)
+)
+
+# --------------------------------------------------
+# Row-Level Missingness Analysis
+# --------------------------------------------------
+
+print("\n" + "=" * 60)
+print("ROW-LEVEL MISSINGNESS ANALYSIS")
+print("=" * 60)
+
+
+# Count how many technical values are missing in each row
+missing_per_row = (
+    df[technical_columns]
+    .isnull()
+    .sum(axis=1)
+)
+
+
+print("\nNumber of missing technical values per row:")
+
+print(
+    missing_per_row
+    .value_counts()
+    .sort_index()
+)
+
+
+# --------------------------------------------------
+# Completely missing technical specifications
+# --------------------------------------------------
+
+completely_missing = (
+    missing_per_row == len(technical_columns)
+)
+
+complete_missing_count = completely_missing.sum()
+
+
+print("\nRows with ALL technical specifications missing:")
+
+print(complete_missing_count)
+
+
+print("\nPercentage of rows with ALL technical specifications missing:")
+
+print(
+    round(
+        complete_missing_count / len(df) * 100,
+        2
+    ),
+    "%"
+)
+
+
+# --------------------------------------------------
+# Partially missing technical specifications
+# --------------------------------------------------
+
+partially_missing = (
+    (missing_per_row > 0)
+    & (missing_per_row < len(technical_columns))
+)
+
+partial_missing_count = partially_missing.sum()
+
+
+print("\nRows with PARTIALLY missing technical specifications:")
+
+print(partial_missing_count)
+
+
+# --------------------------------------------------
+# Rows with no technical missing values
+# --------------------------------------------------
+
+no_missing = (
+    missing_per_row == 0
+)
+
+no_missing_count = no_missing.sum()
+
+
+print("\nRows with NO technical missing values:")
+
+print(no_missing_count)
+
+
+# --------------------------------------------------
+# Missingness pattern
+# --------------------------------------------------
+
+print("\n" + "=" * 60)
+print("MISSINGNESS PATTERN")
+print("=" * 60)
+
+
+missing_pattern = (
+    df[technical_columns]
+    .isnull()
+    .astype(int)
+    .astype(str)
+    .agg("".join, axis=1)
+)
+
+
+pattern_counts = (
+    missing_pattern
+    .value_counts()
+)
+
+
+print("\nMissingness patterns:")
+
+print(pattern_counts)
+
+
+# --------------------------------------------------
+# Examples of completely missing rows
+# --------------------------------------------------
+
+print("\n" + "=" * 60)
+print("EXAMPLES OF COMPLETELY MISSING TECHNICAL RECORDS")
+print("=" * 60)
+
+
+display_columns = [
+    "name",
+    "year",
+    "selling_price",
+    "km_driven",
+    "fuel",
+    "seller_type",
+    "transmission",
+    "owner"
+]
+
+
+print(
+    df.loc[
+        completely_missing,
+        display_columns
+    ]
+    .head(20)
     .to_string(index=False)
 )
